@@ -1,4 +1,5 @@
-var fun = require("./requestFunctions");
+var helpers = require("./requestHelpers");
+var process = require("./requestProcess");
 
 function faviconico(response) {
   // Suppress favicon, uncomment to see during each call
@@ -9,7 +10,8 @@ function faviconico(response) {
 
 function contentheader(response) {
   console.log("Request handler 'content header' was called.");
-  var html = fun.header();
+  
+  var html = process.header();
 
   response.writeHead(200, {"Context-Type": "text/plain"});
   response.write(html);
@@ -18,7 +20,8 @@ function contentheader(response) {
 
 function contentfooter(response) {
   console.log("Request handler 'content footer' was called.");
-  var html = fun.footer();
+  
+  var html = process.footer();
 
   response.writeHead(200, {"Context-Type": "text/plain"});
   response.write(html);
@@ -27,22 +30,20 @@ function contentfooter(response) {
 
 function start(response) {
   console.log("Request handler 'start' was called.");
+  
+  var html = process.start();  
+  
   response.writeHead(200, {"Context-Type": "text/plain"});
-  
-  var html = fun.header() + 
-      "<p>Hello Start</p>";
-  
   response.write(html);
   response.end();
 }
 
-function upload(response) {
+function upload(response, postData) {
   console.log("Request handler 'upload' was called.");
+  
+  var html = process.upload(postData);
+  
   response.writeHead(200, {"Context-Type": "text/plain"});
-  
-  var html = fun.header() + 
-      "<p>Hello Upload</p>";
-  
   response.write(html);
   response.end();
 }
