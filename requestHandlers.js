@@ -1,51 +1,30 @@
-var helpers = require("./requestHelpers");
 var process = require("./requestProcess");
 
-function faviconico(response) {
+function faviconico(request, response) {
   // Suppress favicon, uncomment to see during each call
   //response.writeHead(200, {"Context-Type": "text/plain"});
   //response.write("Hello favicon");
   response.end();
 }
 
-function contentheader(response) {
-  console.log("Request handler 'content header' was called.");
-  
-  var html = process.header();
-
-  response.writeHead(200, {"Context-Type": "text/plain"});
-  response.write(html);
-  response.end();
+function contentheader(request, response) {
+  console.log("Request handler 'content header' was called.");  
+  process.header(request, response);
 }
 
-function contentfooter(response) {
+function contentfooter(request, response) {
   console.log("Request handler 'content footer' was called.");
-  
-  var html = process.footer();
-
-  response.writeHead(200, {"Context-Type": "text/plain"});
-  response.write(html);
-  response.end();
+  process.footer(request, response);
 }
 
-function start(response) {
-  console.log("Request handler 'start' was called.");
-  
-  var html = process.start();  
-  
-  response.writeHead(200, {"Context-Type": "text/plain"});
-  response.write(html);
-  response.end();
+function start(request, response) {
+  console.log("Request handler 'start' was called.");  
+  process.start(request, response);  
 }
 
-function upload(response, postData) {
+function upload(request, response) {
   console.log("Request handler 'upload' was called.");
-  
-  var html = process.upload(postData);
-  
-  response.writeHead(200, {"Context-Type": "text/plain"});
-  response.write(html);
-  response.end();
+  process.upload(request, response);
 }
 
 exports.faviconico = faviconico;

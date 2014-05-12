@@ -1,4 +1,7 @@
-var querystring = require("querystring");
+var url = require('url');
+var fs = require("fs");
+var formidable = require("formidable");
+var helpers = require("./requestHelpers");
 
 function header() {
   var html = "<p>Content Header</p>";
@@ -10,7 +13,28 @@ function footer() {
   return html;
 }
 
-function start() {
+function contextheader(request, response) {
+  var html = header();
+  
+  response.writeHead(200, {"Context-Type": "text/plain"});
+  response.write(html);
+  response.end();
+}
+
+function contextfooter(request, response) {
+  var html = footer();
+  
+  response.writeHead(200, {"Context-Type": "text/plain"});
+  response.write(html);
+  response.end();
+}
+
+function start(request, response) {
+  //Process querystring parameters
+  //example here is to use for prefilling the form
+  var url_parts = url.parse(request.url, true);
+  var query = url_parts.query;
+  
   var html = '<html>' +
     '<head>' +
     '<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />' +
@@ -18,7 +42,7 @@ function start() {
     '<body>' +
       header() +
       '<form action="/upload" method="post">' +
-      '<b>Subject</b>: <input type="text" name="mysubject"><br>' + 
+      '<b>Subject</b>: <input type="text" name="mysubject" value="' + (query.mysubject || '') + '"><br>' + 
       '<b>Body</b>: <br><textarea name="mybody" rows="20" cols="60"></textarea>' +
       '<br />' +
       '<input type="submit" value="Submit text" />' +
@@ -26,29 +50,52 @@ function start() {
       footer() +
     '</body>' +
     '</html>';
-  
-  return html;
+
+  response.writeHead(200, {"Context-Type": "text/plain"});
+  response.write(html);
+  response.end();
 }
 
-function upload(postData) {
-  var html = '<html>' +
-    '<head>' +
-    '<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />' +
-    '</head>' +
-    '<body>' +
-      header() +
-      '<p>You sent Subject: <br>' +
-      querystring.parse(postData).mysubject + '</p>' +
-      '<p>You sent Body: <br>' +
-      querystring.parse(postData).mybody + '</p>' +      
-      footer() +
-    '</body>' +
-    '</html>';
+function upload(request, response) {
+  //Process form parameters
+  //Need to use the anonymouse callback to avoid
+  //blocking calls for large payloads and images
+  var form = new formidable.IncomingForm();
+  console.log("about to parse");
+  form.parse(request, function(error, fields, files) {
+    console.log("parsing done");
+    
+    if(error) {
+      console.log("No request handler found for " + pathname);
+      response.writeHead(422, {"Context-Type": "text/plain"});
+      response.write("422 Unprocessable Entity");
+      response.end();    
+    }
+    
+    var html = 
+      '<html>' +
+      '<head>' +
+      '<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />' +
+      '</head>' +
+      '<body>' +
+        header() +
+        '<p>You sent Subject: <br>' +
+        fields.mysubject + '</p>' +
+        '<p>You sent Body: <br>' +
+        fields.mybody + '</p>' +      
+        footer() +
+      '</body>' +
+      '</html>';
   
-  return html;        
+    response.writeHead(200, {"Context-Type": "text/plain"});
+    response.write(html);
+    response.end(); 
+  })
+  
+  console.log("upload done");
 }
 
-exports.header = header;
-exports.footer = footer;
+exports.header = contextheader;
+exports.footer = contextfooter;
 exports.start = start;
 exports.upload = upload;
