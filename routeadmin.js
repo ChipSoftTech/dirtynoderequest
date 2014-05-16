@@ -1,14 +1,5 @@
 var url = require('url');
-
-function header() {
-    var html = "<p>Content Header</p>";
-    return html;
-}
-
-function footer() {
-    var html = "<p>Content Footer</p>";
-    return html;
-}
+var helpers = require('./requesthelpers');
 
 function process (request, response) {  
     //console.log("Route Process: admin");
@@ -22,7 +13,9 @@ function process (request, response) {
     '<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />' +
     '</head>' +
     '<body>' +
+    helpers.header() + 
     '<p>This is Admin</p>' +
+    helpers.footer() +
     '</body>' +
     '</html>';
 
